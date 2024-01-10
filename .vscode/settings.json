@@ -4,8 +4,8 @@
   "eslint.enable": true,
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.addMissingImports": true
+    "source.fixAll.eslint": "explicit",
+    "source.addMissingImports": "explicit"
   },
   "eslint.workingDirectories": [{ "mode": "auto" }],
   "[typescriptreact]": {
