@@ -10,15 +10,22 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.25.7",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-menubar": "^1.0.4",
+    "@radix-ui/react-slot": "^1.0.2",
     "@tailwindcss/typography": "^0.5.10",
     "assert": "^2.1.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-n": "^16.1.0",
     "eslint-plugin-tailwindcss": "^3.13.0",
     "latest-version": "^7.0.0",
+    "lucide-react": "^0.309.0",
     "next": "13.5.4",
     "react": "^18",
     "react-dom": "^18",
+    "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
