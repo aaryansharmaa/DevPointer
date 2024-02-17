@@ -20,7 +20,6 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { createQuestion } from "@/lib/actions/question.action";
 import { useRouter, usePathname } from "next/navigation";
-import { Router } from "lucide-react";
 
 const type: any = "create";
 
@@ -52,6 +51,7 @@ const Question = ({ mongoUserId }: Props) => {
         content: values.explanation,
         tags: values.tags,
         author: JSON.parse(mongoUserId),
+        path: pathname,
       });
       // navigate to home page
 
