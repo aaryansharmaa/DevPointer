@@ -31,7 +31,7 @@ export const getTimestamp = (createdAt: Date): string => {
   }
 };
 
-export function formatNumber(number) {
+export function formatNumber(number: number) {
   if (number < 1000) {
     // If the number is less than 1000, return it as is
     return number.toString();
