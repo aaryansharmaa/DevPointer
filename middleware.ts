@@ -1,23 +1,15 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Define routes that do not require authentication
-const isPublicRoute = createRouteMatcher([
-  "/", // Home page
-  "/api/webhook", // Webhook endpoint
-  "/question(.*)", // Dynamic public questions route
-  "/tags(.*)", // Public tags listing
-  "/profile(.*)", // Public profile details
-  "/community", // Public community page
-  "/jobs", // Public job listings
+const isProtectedRoute = createRouteMatcher([
+  "/question/:id",
+  "/tags",
+  "/profile/:id",
 ]);
 
 export default clerkMiddleware((auth, req) => {
-  // Check if the request route is one of the public routes
-  if (!isPublicRoute(req)) {
-    auth().protect(); // Protect all non-public routes
-  }
+  if (isProtectedRoute(req)) auth().protect();
 });
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!...|_next).)", "/", "/(api|trpc)(.)"],
 };
