@@ -3,9 +3,9 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { createUser, deleteUser, updateUser } from "@/lib/actions/user.action";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: any) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
 
   const WEBHOOK_SECRET = process.env.NEXT_CLERK_WEBHOOK_SECRET;
