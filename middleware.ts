@@ -1,24 +1,25 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Define public routes where no authentication is needed
+// Define protected routes - assuming you want to protect everything except explicitly mentioned public and ignored routes
+const isProtectedRoute = createRouteMatcher([]);
+
+// Define public routes - these routes will not require authentication
 const isPublicRoute = createRouteMatcher([
-  "/", // Home page is public
-  "/api/webhook", // Webhook should be accessible without authentication
-  "/question/(.)", // Question details are public
-  "/tags", // Listing of tags is public
-  "/tags/(.)", // Specific tag details are public
+  "/api/webhook", // Webhook endpoint
+  "/question/(.*)", // Questions are public, capturing dynamic id
+  "/tags", // Public listing of tags
+  "/tags/(.*)", // Public tag details
   "/community", // Community page is public
-  "/jobs",
-  "/api/chatgpt", // Jobs listing is public
+  "/jobs", // Job listing is public
 ]);
 
 export default clerkMiddleware((auth, req) => {
-  // Protect routes that are not explicitly public
-  if (!isPublicRoute(req)) {
-    auth().protect(); // Redirect unauthenticated users to sign-in
+  // Apply protection only to protected routes and not to public or ignored routes
+  if (!isPublicRoute(req) && isProtectedRoute(req)) {
+    auth().protect();
   }
 });
 
 export const config = {
-  matcher: ["/((?!...|_next).)", "/", "/(api|trpc)(.)"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
