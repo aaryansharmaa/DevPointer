@@ -5,10 +5,9 @@ import { WebhookEvent } from "@clerk/nextjs/server";
 import { createUser, deleteUser, updateUser } from "@/lib/actions/user.action";
 import { NextResponse } from "next/server";
 
-const WEBHOOK_SECRET = process.env.NEXT_CLERK_WEBHOOK_SECRET;
-
-export async function POST(req: any) {
+export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
+  const WEBHOOK_SECRET = process.env.NEXT_CLERK_WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
     throw new Error(
@@ -32,7 +31,6 @@ export async function POST(req: any) {
   // Get the body
   const payload = await req.json();
   const body = JSON.stringify(payload);
-  console.log("Received webhook with body:", payload);
 
   // Create a new SVIX instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
