@@ -4,10 +4,9 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 const isPublicRoute = createRouteMatcher([
   "/", // Home page
   "/api/webhook", // Webhook endpoint
-  "/question/:id", // Dynamic public questions route
-  "/tags", // Public tags listing
-  "/tags/:id", // Public tag details
-  "/profile/:id", // Public profile details
+  "/question(.*)", // Dynamic public questions route
+  "/tags(.*)", // Public tags listing
+  "/profile(.*)", // Public profile details
   "/community", // Public community page
   "/jobs", // Public job listings
 ]);
