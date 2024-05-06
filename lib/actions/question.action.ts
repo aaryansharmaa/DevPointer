@@ -7,6 +7,7 @@ import {
   CreateQuestionParams,
   GetQuestionByIdParams,
   GetQuestionsParams,
+  QuestionVoteParams,
 } from "./shared.types";
 import User from "../database/user.model";
 import { revalidatePath } from "next/cache";
@@ -14,6 +15,7 @@ import { revalidatePath } from "next/cache";
 export async function getQuestions(params: GetQuestionsParams) {
   try {
     connectToDatabase();
+
     const questions = await Question.find({})
       .populate({ path: "tags", model: Tag })
       .populate({ path: "author", model: User })
@@ -31,8 +33,8 @@ export async function createQuestion(params: CreateQuestionParams) {
     connectToDatabase();
 
     const { title, content, tags, author, path } = params;
-    // create the question
 
+    // Create the question
     const question = await Question.create({
       title,
       content,
@@ -40,7 +42,8 @@ export async function createQuestion(params: CreateQuestionParams) {
     });
 
     const tagDocuments = [];
-    // create tags or get them if they already exist
+
+    // Create the tags or get them if they already exist
     for (const tag of tags) {
       const existingTag = await Tag.findOneAndUpdate(
         { name: { $regex: new RegExp(`^${tag}$`, "i") } },
@@ -55,6 +58,10 @@ export async function createQuestion(params: CreateQuestionParams) {
       $push: { tags: { $each: tagDocuments } },
     });
 
+    // Create an interaction record for the user's ask_question action
+
+    // Increment author's reputation by +5 for creating a question
+
     revalidatePath(path);
   } catch (error) {}
 }
@@ -62,6 +69,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
     connectToDatabase();
+
     const { questionId } = params;
 
     const question = await Question.findById(questionId)
@@ -73,6 +81,78 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
       });
 
     return question;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function upvoteQuestion(params: QuestionVoteParams) {
+  try {
+    connectToDatabase();
+
+    const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    let updateQuery = {};
+
+    if (hasupVoted) {
+      updateQuery = { $pull: { upvotes: userId } };
+    } else if (hasdownVoted) {
+      updateQuery = {
+        $pull: { downvotes: userId },
+        $push: { upvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { upvote: userId } };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    // Increment author's reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function downvoteQuestion(params: QuestionVoteParams) {
+  try {
+    connectToDatabase();
+
+    const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    let updateQuery = {};
+
+    if (hasdownVoted) {
+      updateQuery = { $pull: { downvote: userId } };
+    } else if (hasupVoted) {
+      updateQuery = {
+        $pull: { upvotes: userId },
+        $push: { downvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { downvotes: userId } };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error("Question not found");
+    }
+
+    // Increment author's reputation
+
+    revalidatePath(path);
   } catch (error) {
     console.log(error);
     throw error;

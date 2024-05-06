@@ -31,15 +31,14 @@ export const getTimestamp = (createdAt: Date): string => {
   }
 };
 
-export function formatNumber(number: number) {
-  if (number < 1000) {
-    // If the number is less than 1000, return it as is
-    return number.toString();
-  } else if (number < 1000000) {
-    // If the number is at least 1000 but less than a million, divide by 1000 and append 'K'
-    return (number / 1000).toFixed(1) + "K";
+export const formatAndDivideNumber = (num: number): string => {
+  if (num >= 1000000) {
+    const formattedNum = (num / 1000000).toFixed(1);
+    return `${formattedNum}M`;
+  } else if (num >= 1000) {
+    const formattedNum = (num / 1000).toFixed(1);
+    return `${formattedNum}K`;
   } else {
-    // If the number is a million or more, divide by a million and append 'M'
-    return (number / 1000000).toFixed(1) + "M";
+    return num.toString();
   }
-}
+};
