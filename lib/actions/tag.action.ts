@@ -2,7 +2,7 @@
 
 import Tag from "../database/tag.model";
 import User from "../database/user.model";
-import { connectToDatabase } from "../mongoose";
+import { connectToDatabase } from "../database/mongoose";
 import { GetAllTagsParams, GetTopInteractedTagsParams } from "./shared.types";
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {

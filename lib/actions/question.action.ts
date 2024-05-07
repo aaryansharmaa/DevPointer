@@ -1,6 +1,6 @@
 "use server";
 
-import { connectToDatabase } from "../mongoose";
+import { connectToDatabase } from "../database/mongoose";
 import Tag from "../database/tag.model";
 import Question from "../database/question.model";
 import {
@@ -103,7 +103,7 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
         $push: { upvotes: userId },
       };
     } else {
-      updateQuery = { $addToSet: { upvote: userId } };
+      updateQuery = { $addToSet: { upvotes: userId } };
     }
 
     const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
@@ -132,7 +132,7 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     let updateQuery = {};
 
     if (hasdownVoted) {
-      updateQuery = { $pull: { downvote: userId } };
+      updateQuery = { $pull: { downvotes: userId } };
     } else if (hasupVoted) {
       updateQuery = {
         $pull: { upvotes: userId },

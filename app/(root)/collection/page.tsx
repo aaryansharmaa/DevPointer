@@ -8,16 +8,13 @@ import { auth } from "@clerk/nextjs/server";
 
 export default async function Home() {
   const { userId } = auth();
-
   if (!userId) return null;
-
-  const result = await getSavedQuestions({
-    clerkId: userId,
-  });
-
+  const result = await getSavedQuestions({ clerkId: userId });
   return (
     <>
-      <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
+      <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
+        <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
+      </div>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearchbar
@@ -30,7 +27,7 @@ export default async function Home() {
 
         <Filter
           filters={QuestionFilters}
-          otherClasses="min-h-[56px] sm:min-w-[170px]"
+          otherClasses="min-h-[56px] sm:min-w-[170px] "
         />
       </div>
 
@@ -51,8 +48,8 @@ export default async function Home() {
           ))
         ) : (
           <NoResult
-            title="There’s no question saved to show"
-            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+            title="There is no saved questions to show"
+            description="Be the first to ask a questions"
             link="/ask-question"
             linkTitle="Ask a Question"
           />

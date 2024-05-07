@@ -7,69 +7,27 @@ export interface IUser extends Document {
   email: string;
   password?: string;
   bio?: string;
-  picture?: string;
+  picture: string;
   location?: string;
-  portfolioLink?: string;
-  reputation: number;
-  joinDate: Date;
-  savedPosts: Schema.Types.ObjectId[];
+  portfolioWebsite?: string;
+  reputation?: number;
+  saved: Schema.Types.ObjectId[];
+  joinedAt: Date;
 }
 
 const UserSchema = new Schema({
-  clerkId: {
-    type: String,
-    required: true,
-    unique: true, // Assuming Clerk ID is unique for each user
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  username: {
-    type: String,
-    required: true,
-    unique: true, // Usernames should be unique
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true, // Email addresses should be unique
-  },
-  password: {
-    type: String,
-    // Password may not be required if using alternative auth methods
-  },
-  bio: {
-    type: String,
-    // Optional field, users may not have a bio
-  },
-  picture: {
-    type: String,
-    // URL to the user's picture, optional
-  },
-  location: {
-    type: String,
-    // Optional field, not all users may want to share their location
-  },
-  portfolioWebsite: {
-    type: String,
-    // Optional field, not all users have a portfolio
-  },
-  reputation: {
-    type: Number,
-    default: 0, // Optional field, can be used for gamification, starts at 0
-  },
-  joinedAt: {
-    type: Date,
-    default: Date.now, // Automatically set to the current date when a new user is created
-  },
-  saved: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Post", // Assuming you have a Post model
-      // This field will store references to posts saved by the user
-    },
-  ],
+  clerkId: { type: String, required: true },
+  name: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String },
+  bio: { type: String },
+  picture: { type: String, required: true },
+  location: { type: String },
+  portfolioWebsite: { type: String },
+  reputation: { type: Number, default: 0 },
+  saved: [{ type: Schema.Types.ObjectId, ref: "Question" }],
+  joinedAt: { type: Date, default: Date.now },
 });
 
 const User = models.User || model("User", UserSchema);
