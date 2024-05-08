@@ -1,63 +1,115 @@
-import QuestionCard from "@/components/cards/QuestionCard";
-import Filter from "@/components/shared/Filter";
-import NoResult from "@/components/shared/NoResult";
-import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
-import { QuestionFilters } from "@/constants/filters";
-import { getSavedQuestions } from "@/lib/actions/user.action";
+import Answer from "@/components/forms/Answer";
+import AllAnswers from "@/components/shared/AllAnswers";
+import Metric from "@/components/shared/Metric";
+import ParseHTML from "@/components/shared/ParseHTML";
+import RenderTag from "@/components/shared/RenderTag";
+import Votes from "@/components/shared/Votes";
+import { getQuestionById } from "@/lib/actions/question.action";
+import { getUserById } from "@/lib/actions/user.action";
+import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 
-export default async function Home() {
-  const { userId } = auth();
+const Page = async ({ params, searchParams }) => {
+  const { userId: clerkId } = auth();
 
-  if (!userId) return null;
+  let mongoUser;
 
-  const result = await getSavedQuestions({
-    clerkId: userId,
-  });
+  if (clerkId) {
+    mongoUser = await getUserById({ userId: clerkId });
+  }
+
+  const result = await getQuestionById({ questionId: params.id });
 
   return (
     <>
-      <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
-
-      <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        <LocalSearchbar
-          route="/"
-          iconPosition="left"
-          imgSrc="/assets/icons/search.svg"
-          placeholder="Search for questions"
-          otherClasses="flex-1"
-        />
-
-        <Filter
-          filters={QuestionFilters}
-          otherClasses="min-h-[56px] sm:min-w-[170px]"
-        />
-      </div>
-
-      <div className="mt-10 flex w-full flex-col gap-6">
-        {result.questions.length > 0 ? (
-          result.questions.map((question: any) => (
-            <QuestionCard
-              key={question._id}
-              _id={question._id}
-              title={question.title}
-              tags={question.tags}
-              author={question.author}
-              upvotes={question.upvotes}
-              views={question.views}
-              answers={question.answers}
-              createdAt={question.createdAt}
+      <div className="flex-start w-full flex-col">
+        <div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
+          <Link
+            href={`/profile/${result.author.clerkId}`}
+            className="flex items-center justify-start gap-1"
+          >
+            <Image
+              src={result.author.picture}
+              className="rounded-full"
+              width={22}
+              height={22}
+              alt="profile"
             />
-          ))
-        ) : (
-          <NoResult
-            title="There’s no question saved to show"
-            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
-            link="/ask-question"
-            linkTitle="Ask a Question"
-          />
-        )}
+            <p className="paragraph-semibold text-dark300_light700">
+              {result.author.name}
+            </p>
+          </Link>
+          <div className="flex justify-end">
+            <Votes
+              type="Question"
+              itemId={JSON.stringify(result._id)}
+              userId={JSON.stringify(mongoUser._id)}
+              upvotes={result.upvotes.length}
+              hasupVoted={result.upvotes.includes(mongoUser._id)}
+              downvotes={result.downvotes.length}
+              hasdownVoted={result.downvotes.includes(mongoUser._id)}
+              hasSaved={mongoUser?.saved.includes(result._id)}
+            />
+          </div>
+        </div>
+        <h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full text-left">
+          {result.title}
+        </h2>
       </div>
+
+      <div className="mb-8 mt-5 flex flex-wrap gap-4">
+        <Metric
+          imgUrl="/assets/icons/clock.svg"
+          alt="clock icon"
+          value={` asked ${getTimestamp(result.createdAt)}`}
+          title=" Asked"
+          textStyles="small-medium text-dark400_light800"
+        />
+        <Metric
+          imgUrl="/assets/icons/message.svg"
+          alt="message"
+          value={formatAndDivideNumber(result.answers.length)}
+          title=" Answers"
+          textStyles="small-medium text-dark400_light800"
+        />
+        <Metric
+          imgUrl="/assets/icons/eye.svg"
+          alt="eye"
+          value={formatAndDivideNumber(result.views)}
+          title=" Views"
+          textStyles="small-medium text-dark400_light800"
+        />
+      </div>
+
+      <ParseHTML data={result.content} />
+
+      <div className="mt-8 flex flex-wrap gap-2">
+        {result.tags.map((tag: any) => (
+          <RenderTag
+            key={tag._id}
+            _id={tag._id}
+            name={tag.name}
+            showCount={false}
+          />
+        ))}
+      </div>
+
+      <AllAnswers
+        questionId={result._id}
+        userId={mongoUser._id}
+        totalAnswers={result.answers.length}
+      />
+
+      <Answer
+        question={result.content}
+        questionId={JSON.stringify(result._id)}
+        authorId={JSON.stringify(mongoUser._id)}
+      />
     </>
   );
-}
+};
+
+export default Page;
