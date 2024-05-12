@@ -42,3 +42,13 @@ export const formatAndDivideNumber = (num: number): string => {
     return num.toString();
   }
 };
+
+export const getJoinedDate = (date: Date): string => {
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+  return `${month} ${year}`;
+};
+
+// Example usage:
+const exampleDate = new Date();
+console.log(getJoinedDate(exampleDate)); // Output will be something like "May 2024"
