@@ -217,11 +217,30 @@ export async function getUserQuestions(params: GetUserStatsParams) {
     const totalQuestions = await Question.countDocuments({ author: userId });
 
     const userQuestions = await Question.find({ author: userId })
-      .sort({ view: -1, upvote: -1 })
+      .sort({ view: -1, upvotes: -1 })
       .populate("tags", "id name")
       .populate("author", "id clerkId name picture");
 
     return { totalQuestions, question: userQuestions };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+export async function getUserAnswers(params: GetUserStatsParams) {
+  try {
+    connectToDatabase();
+
+    const { userId, page = 1, pageSize = 10 } = params;
+
+    const totalAnswers = await Answer.countDocuments({ author: userId });
+
+    const userAnswers = await Answer.find({ author: userId })
+      .sort({ upvotes: -1 })
+      .populate("question", "id title")
+      .populate("author", "id clerkId name picture");
+
+    return { totalAnswers, answers: userAnswers };
   } catch (error) {
     console.log(error);
     throw error;
