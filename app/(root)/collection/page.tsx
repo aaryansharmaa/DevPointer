@@ -3,13 +3,19 @@ import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { QuestionFilters } from "@/constants/filters";
+import { getQuestions } from "@/lib/actions/question.action";
 import { getSavedQuestions } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 
-export default async function Home() {
+export default async function Home({ searchParams }: SearchParamsProps) {
   const { userId } = auth();
   if (!userId) return null;
-  const result = await getSavedQuestions({ clerkId: userId });
+  const result = await getSavedQuestions({
+    clerkId: userId,
+    searchQuery: searchParams.q,
+  });
+
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
