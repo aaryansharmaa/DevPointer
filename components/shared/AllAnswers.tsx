@@ -7,6 +7,7 @@ import Image from "next/image";
 import { getTimestamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
+import Pagination from "./Pagination";
 
 interface Props {
   questionId: string;
@@ -23,7 +24,7 @@ const AllAnswers = async ({
   page,
   filter,
 }: Props) => {
-  const answer = await getAnswers({
+  const result = await getAnswers({
     questionId,
     page: page ? +page : 1,
     sortBy: filter,
@@ -35,7 +36,7 @@ const AllAnswers = async ({
         <Filter filters={AnswerFilters} />
       </div>
       <div>
-        {answer.answers.map((answer) => (
+        {result.answers.map((answer) => (
           <article key={answer._id} className="light-border border-b py-10">
             <div className="flex items-center justify-between">
               <div className="mb-8 flex flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center">
@@ -76,6 +77,9 @@ const AllAnswers = async ({
             <ParseHTML data={answer.content[0]} />
           </article>
         ))}
+      </div>
+      <div className="mt-10">
+        <Pagination pageNumber={page ? +page : 1} isNext={result.isNext} />
       </div>
     </div>
   );
