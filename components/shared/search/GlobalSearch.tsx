@@ -12,11 +12,30 @@ const GlobalSearch = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchContainerRef = useRef(null);
-
   const query = searchParams.get("q");
 
   const [search, setSearch] = useState(query || "");
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: any) => {
+      if (
+        searchContainerRef.current &&
+        // @ts-ignore
+        !searchContainerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+        setSearch("");
+      }
+    };
+
+    setIsOpen(false);
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     const handleOutsideClick = (event: any) => {
