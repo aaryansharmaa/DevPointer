@@ -12,11 +12,30 @@ const GlobalSearch = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchContainerRef = useRef(null);
-
   const query = searchParams.get("q");
 
   const [search, setSearch] = useState(query || "");
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: any) => {
+      if (
+        searchContainerRef.current &&
+        // @ts-ignore
+        !searchContainerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+        setSearch("");
+      }
+    };
+
+    setIsOpen(false);
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     const handleOutsideClick = (event: any) => {
@@ -88,7 +107,7 @@ const GlobalSearch = () => {
             if (!isOpen) setIsOpen(true);
             if (e.target.value === "" && isOpen) setIsOpen(false);
           }}
-          className="paragraph-regular no-focus placeholder text-dark400_light700 background-light800_darkgradient border-none shadow-none outline-none"
+          className="paragraph-regular no-focus placeholder text-dark400_light700  border-none bg-transparent shadow-none outline-none"
         />
       </div>
       {isOpen && <GlobalResult />}
